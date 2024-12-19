@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./database.sqlite"
+}
+
+// schema.prisma
+
+model Game {
+  id            String @id @default(cuid())
+  homeTeam      String
+  awayTeam      String
+  homeScore     Int
+  awayScore     Int
+  remainingTime String
+  odds          Odds   @relation(fields: [oddsId], references: [id])
+  oddsId        String @unique
+  bets          Bet[]
+}
+
+model Odds {
+  id   String @id @default(cuid())
+  home Float
+  away Float
+  draw Float
+  Game Game?
+}
+
+model Bet {
+  id     String @id @default(cuid())
+  gameId String
+  amount Float
+  type   String
+  game   Game   @relation(fields: [gameId], references: [id])
+}
+
+// enum BetType {
+//   home
+//   away
+//   draw
+// }
+
+model LeaderboardEntry {
+  id            String @id @default(cuid())
+  userId        String // Assuming userId is a reference to a User model (not defined here)
+  username      String
+  totalWinnings Float
+}
