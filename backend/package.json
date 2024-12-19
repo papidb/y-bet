@@ -6,6 +6,7 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "@prisma/client": "5.22.0",
     "@types/better-sqlite3": "^7.6.12",
     "better-auth": "^1.0.22",
     "better-sqlite3": "^11.7.0",
