@@ -1,8 +1,6 @@
 import { Elysia, t } from "elysia";
-import statusCodes from "http-status-codes";
 
 import { PrismaClient } from "@prisma/client";
-import { betterAuthView, userInfo, userMiddleware } from "./lib/better-auth";
 
 import cors from "@elysiajs/cors";
 import WebSocket from "ws";
@@ -33,23 +31,18 @@ const app = new Elysia()
       credentials: true,
     })
   )
-  .derive(({ request }) => userMiddleware(request))
-  .all("/api/auth/*", betterAuthView)
-  .get("/user", ({ user, session }) => userInfo(user, session))
+  // .derive(({ request }) => userMiddleware(request))
+  // .all("/api/auth/*", betterAuthView)
+  // .get("/user", ({ user, session }) => userInfo(user, session))
   .post(
     "/bets",
-    ({ body, user, error }) => {
-      if (!user) {
-        return error(statusCodes.METHOD_NOT_ALLOWED, {
-          message: "You must be logged in to create a bet",
-        });
-      }
+    ({ body, error }) => {
       return db.bet.create({
         data: {
           amount: body.amount,
           type: body.type,
           gameId: body.gameId,
-          userId: user.id,
+          username: "currentUser",
         },
       });
     },
@@ -64,21 +57,9 @@ const app = new Elysia()
       }),
     }
   )
-  .get(
-    "/bets/:id",
-    ({ params: { id } }) => {
-      return db.bet.findMany({
-        where: {
-          userId: id,
-        },
-      });
-    },
-    {
-      params: t.Object({
-        id: t.String(),
-      }),
-    }
-  )
+  .get("/bets", () => {
+    return db.bet.findMany({});
+  })
   .get("/", () => "Hello World!")
   .use(heartBeatCron)
   .listen(process.env.PORT ?? 3000);

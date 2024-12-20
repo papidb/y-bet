@@ -9,8 +9,7 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Real-time Sports Betting</h1>
+    <div >
       <Outlet />
     </div>
   );
