@@ -46,6 +46,7 @@ model user {
   updatedAt     DateTime
   account       account[]
   session       session[]
+  bets          Bet[]
 }
 
 model verification {
@@ -78,11 +79,13 @@ model Odds {
 }
 
 model Bet {
-  id     String @id @default(cuid())
+  id     String  @id @default(cuid())
   gameId String
   amount Float
   type   String
-  game   Game   @relation(fields: [gameId], references: [id])
+  game   Game    @relation(fields: [gameId], references: [id])
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 // enum BetType {
