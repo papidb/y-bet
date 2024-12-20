@@ -4,10 +4,15 @@ import statusCodes from "http-status-codes";
 import { PrismaClient } from "@prisma/client";
 import { betterAuthView, userInfo, userMiddleware } from "./lib/better-auth";
 
+import cors from "@elysiajs/cors";
 import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
 import { heartBeatCron } from "./crons";
 import { pubClient, subClient } from "./lib/redis";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const db = new PrismaClient();
 
@@ -18,6 +23,16 @@ enum BetType {
 }
 
 const app = new Elysia()
+  .use(
+    cors({
+      origin: process.env.ALLOWED_ORIGIN,
+      allowedHeaders: ["Content-Type", "Authorization"],
+      methods: ["POST", "GET", "OPTIONS"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
+      credentials: true,
+    })
+  )
   .derive(({ request }) => userMiddleware(request))
   .all("/api/auth/*", betterAuthView)
   .get("/user", ({ user, session }) => userInfo(user, session))
@@ -66,7 +81,7 @@ const app = new Elysia()
   )
   .get("/", () => "Hello World!")
   .use(heartBeatCron)
-  .listen(3000);
+  .listen(process.env.PORT ?? 3000);
 
 // websocket server
 const wss = new WebSocket.Server({ port: 8080 });
