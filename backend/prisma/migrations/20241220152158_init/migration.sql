@@ -5,9 +5,7 @@ CREATE TABLE "Game" (
     "awayTeam" TEXT NOT NULL,
     "homeScore" INTEGER NOT NULL,
     "awayScore" INTEGER NOT NULL,
-    "remainingTime" TEXT NOT NULL,
-    "oddsId" TEXT NOT NULL,
-    CONSTRAINT "Game_oddsId_fkey" FOREIGN KEY ("oddsId") REFERENCES "Odds" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "startTime" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -15,7 +13,9 @@ CREATE TABLE "Odds" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "home" REAL NOT NULL,
     "away" REAL NOT NULL,
-    "draw" REAL NOT NULL
+    "draw" REAL NOT NULL,
+    "gameId" TEXT NOT NULL,
+    CONSTRAINT "Odds_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -36,4 +36,4 @@ CREATE TABLE "LeaderboardEntry" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Game_oddsId_key" ON "Game"("oddsId");
+CREATE UNIQUE INDEX "Odds_gameId_key" ON "Odds"("gameId");

@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import cors from "@elysiajs/cors";
 import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
-import { heartBeatCron } from "./crons";
+import { createGameCron, updateGameCron } from "./crons";
 import { pubClient, subClient } from "./lib/redis";
 
 import dotenv from "dotenv";
@@ -61,7 +61,8 @@ const app = new Elysia()
     return db.bet.findMany({});
   })
   .get("/", () => "Hello World!")
-  .use(heartBeatCron)
+  .use(createGameCron)
+  .use(updateGameCron)
   .listen(process.env.PORT ?? 3000);
 
 // websocket server

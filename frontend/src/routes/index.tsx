@@ -14,10 +14,7 @@ function RouteComponent() {
   const { connectWebSocket } = useStore();
 
   useEffect(() => {
-    const unsubscribe = connectWebSocket();
-    return () => {
-      unsubscribe();
-    };
+    connectWebSocket();
   }, [connectWebSocket]);
 
   return (

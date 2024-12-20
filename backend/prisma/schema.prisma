@@ -8,23 +8,23 @@ datasource db {
 }
 
 model Game {
-  id            String @id @default(cuid())
-  homeTeam      String
-  awayTeam      String
-  homeScore     Int
-  awayScore     Int
-  remainingTime String
-  odds          Odds   @relation(fields: [oddsId], references: [id])
-  oddsId        String @unique
-  bets          Bet[]
+  id        String   @id @default(cuid())
+  homeTeam  String
+  awayTeam  String
+  homeScore Int
+  awayScore Int
+  bets      Bet[]
+  startTime DateTime
+  Odds      Odds?
 }
 
 model Odds {
-  id   String @id @default(cuid())
-  home Float
-  away Float
-  draw Float
-  Game Game?
+  id     String @id @default(cuid())
+  home   Float
+  away   Float
+  draw   Float
+  gameId String @unique
+  Game   Game   @relation(fields: [gameId], references: [id])
 }
 
 model Bet {

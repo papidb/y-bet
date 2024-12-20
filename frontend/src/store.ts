@@ -22,6 +22,7 @@ export const useStore = create<Store>((set, get) => ({
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log(data)
         if (data.type === "gameUpdate") {
           set({ games: data.games });
         } else if (data.type === "leaderboardUpdate") {
