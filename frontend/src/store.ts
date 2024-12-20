@@ -6,7 +6,7 @@ interface Store {
   games: Game[];
   leaderboard: LeaderboardEntry[];
   bettingHistory: Bet[];
-  connectWebSocket: () => void;
+  connectWebSocket: () => () => void;
   placeBet: (bet: Omit<Bet, "game">) => Promise<void>;
   fetchBettingHistory: () => Promise<void>;
 }
@@ -17,16 +17,25 @@ export const useStore = create<Store>((set, get) => ({
   bettingHistory: [],
 
   connectWebSocket: () => {
-    const socket = new WebSocket("wss://your-backend-url.com");
+    const socket = new WebSocket("ws://localhost:8080/ping");
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "gameUpdate") {
-        set({ games: data.games });
-      } else if (data.type === "leaderboardUpdate") {
-        set({ leaderboard: data.leaderboard });
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "gameUpdate") {
+          set({ games: data.games });
+        } else if (data.type === "leaderboardUpdate") {
+          set({ leaderboard: data.leaderboard });
+        }
+      } catch (error) {
+        console.error(error);
       }
     };
+    const unsubscribe = () => {
+      socket.close();
+    };
+
+    return unsubscribe;
   },
 
   placeBet: async (bet: Omit<Bet, "game">) => {

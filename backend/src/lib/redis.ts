@@ -10,5 +10,8 @@ pubClient
 subClient
   .on("error", (err) => console.log("Redis Client Error", err))
   .connect();
+const publish = (channel: string, message: any) => {
+  pubClient.publish(channel, JSON.stringify(message));
+};
 
-export { pubClient, subClient };
+export { pubClient, publish, subClient };
