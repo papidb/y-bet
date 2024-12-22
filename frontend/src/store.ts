@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { BASE_WS_ROUTE } from "./config/env";
 import { api } from "./config/wrench";
 import { removeDuplicates } from "./lib/utils";
 import { Bet, EventData, Game, LeaderboardEntry } from "./types";
@@ -18,8 +19,7 @@ export const useStore = create<Store>((set, get) => ({
   bettingHistory: [],
 
   connectWebSocket: () => {
-    const socket = new WebSocket("ws://localhost:8080/ping");
-
+    const socket = new WebSocket(BASE_WS_ROUTE);
     socket.onmessage = (event) => {
       try {
         const data: EventData = JSON.parse(event.data);

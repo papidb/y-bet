@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import { Elysia, t } from "elysia";
-import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
 import cors from "./cors";
 import { createGameCron, updateGameCron } from "./crons";
@@ -32,24 +31,35 @@ const app = new Elysia()
   .get("/", () => "Hello World!")
   .use(createGameCron)
   .use(updateGameCron)
+  .ws("/ws", {
+    open(ws) {
+      // Subscribe to the Redis channel on a new WebSocket connection
+      subClient.subscribe(NOTIFICATION_CHANNEL, (message) => {
+        ws.send(message);
+      });
+    },
+    message(_, message) {
+      pubClient.publish(NOTIFICATION_CHANNEL, message as string);
+    },
+  })
   .listen(process.env.PORT ?? 3000);
 
-// websocket server
-const wss = new WebSocket.Server({ port: 8080 });
+// // websocket server
+// const wss = new WebSocket.Server({ port: 8080 });
 
-wss.on("connection", (ws) => {
-  // Subscribe to the Redis channel on a new WebSocket connection
-  subClient.subscribe(NOTIFICATION_CHANNEL, (message) => {
-    ws.send(message);
-  });
+// wss.on("connection", (ws) => {
+//   // Subscribe to the Redis channel on a new WebSocket connection
+//   subClient.subscribe(NOTIFICATION_CHANNEL, (message) => {
+//     ws.send(message);
+//   });
 
-  ws.on("message", (message) => {
-    // Publish the message from WebSocket to the Redis channel
-    pubClient.publish(NOTIFICATION_CHANNEL, message.toString());
-  });
+//   ws.on("message", (message) => {
+//     // Publish the message from WebSocket to the Redis channel
+//     pubClient.publish(NOTIFICATION_CHANNEL, message.toString());
+//   });
 
-  return getActiveGames();
-});
+//   return getActiveGames();
+// });
 
 console.log(
   `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`

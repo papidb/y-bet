@@ -30,7 +30,7 @@ export const createGameCron = cron({
         },
       });
 
-      console.log("createGame", game);
+      console.log("createGame");
       publish(NOTIFICATION_CHANNEL, {
         type: "createGame",
         data: {
@@ -57,22 +57,17 @@ export const updateGameCron = cron({
             gte: sixtySecondsAgo,
           },
         },
+        include: {
+          Odds: true,
+        },
       });
 
-      // console.log(game);
-      // return;
       if (!game) {
         console.log("no games to update");
         return;
       }
 
-      const odds = await db.odds.findFirst({
-        where: {
-          gameId: game.id,
-        },
-      });
-
-      if (!odds) {
+      if (!game.Odds) {
         console.log("no odds for game");
         return;
       }
@@ -92,8 +87,8 @@ export const updateGameCron = cron({
         data: {
           gameId: game.id,
           odds: {
-            team1: odds.home,
-            team2: odds.away,
+            team1: game.Odds.home,
+            team2: game.Odds.away,
           },
         },
       });
