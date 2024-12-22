@@ -1,13 +1,11 @@
+import dotenv from "dotenv";
 import { Elysia, t } from "elysia";
-
-import cors from "@elysiajs/cors";
 import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
-import { pubClient, subClient } from "./lib/redis";
-
-import dotenv from "dotenv";
+import cors from "./cors";
 import { createGameCron, updateGameCron } from "./crons";
 import { createBet, getActiveGames, getBets } from "./db";
+import { pubClient, subClient } from "./lib/redis";
 
 dotenv.config();
 
@@ -18,37 +16,18 @@ enum BetType {
 }
 
 const app = new Elysia()
-  .use(
-    cors({
-      origin: process.env.ALLOWED_ORIGIN,
-      allowedHeaders: ["Content-Type", "Authorization"],
-      methods: ["POST", "GET", "OPTIONS"],
-      exposeHeaders: ["Content-Length"],
-      maxAge: 600,
-      credentials: true,
-    })
-  )
-  .get("/games", () => {
-    return getActiveGames();
-  })
-  .post(
-    "/bets",
-    ({ body, error }) => {
-      return createBet(body);
-    },
-    {
-      body: t.Object({
-        amount: t.Number({
-          minimum: 10,
-          maximum: 100,
-        }),
-        gameId: t.String(),
-        type: t.Enum(BetType),
+  .use(cors)
+  .get("/games", getActiveGames)
+  .get("/bets", getBets)
+  .post("/bets", ({ body }) => createBet(body), {
+    body: t.Object({
+      amount: t.Number({
+        minimum: 10,
+        maximum: 100,
       }),
-    }
-  )
-  .get("/bets", () => {
-    return getBets();
+      gameId: t.String(),
+      type: t.Enum(BetType),
+    }),
   })
   .get("/", () => "Hello World!")
   .use(createGameCron)

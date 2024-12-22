@@ -30,6 +30,7 @@ export const createGameCron = cron({
         },
       });
 
+      console.log("createGame", game);
       publish(NOTIFICATION_CHANNEL, {
         type: "createGame",
         data: {
