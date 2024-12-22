@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import { Elysia, t } from "elysia";
 import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
-import cors from "./cors";
 import { createGameCron, updateGameCron } from "./crons";
 import { createBet, getActiveGames, getBets } from "./db";
 import { pubClient, subClient } from "./lib/redis";
@@ -16,7 +15,7 @@ enum BetType {
 }
 
 const app = new Elysia()
-  .use(cors)
+  // .use(cors)
   .get("/games", getActiveGames)
   .get("/bets", getBets)
   .post("/bets", ({ body }) => createBet(body), {
