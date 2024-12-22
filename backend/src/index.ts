@@ -1,18 +1,15 @@
 import { Elysia, t } from "elysia";
 
-import { PrismaClient } from "@prisma/client";
-
 import cors from "@elysiajs/cors";
 import WebSocket from "ws";
 import { NOTIFICATION_CHANNEL } from "./constants";
-import { createGameCron, updateGameCron } from "./crons";
 import { pubClient, subClient } from "./lib/redis";
 
 import dotenv from "dotenv";
+import { createGameCron, updateGameCron } from "./crons";
+import { createBet, getActiveGames, getBets } from "./db";
 
 dotenv.config();
-
-const db = new PrismaClient();
 
 enum BetType {
   home = "home",
@@ -31,20 +28,13 @@ const app = new Elysia()
       credentials: true,
     })
   )
-  // .derive(({ request }) => userMiddleware(request))
-  // .all("/api/auth/*", betterAuthView)
-  // .get("/user", ({ user, session }) => userInfo(user, session))
+  .get("/games", () => {
+    return getActiveGames();
+  })
   .post(
     "/bets",
     ({ body, error }) => {
-      return db.bet.create({
-        data: {
-          amount: body.amount,
-          type: body.type,
-          gameId: body.gameId,
-          username: "currentUser",
-        },
-      });
+      return createBet(body);
     },
     {
       body: t.Object({
@@ -58,7 +48,7 @@ const app = new Elysia()
     }
   )
   .get("/bets", () => {
-    return db.bet.findMany({});
+    return getBets();
   })
   .get("/", () => "Hello World!")
   .use(createGameCron)
@@ -78,6 +68,8 @@ wss.on("connection", (ws) => {
     // Publish the message from WebSocket to the Redis channel
     pubClient.publish(NOTIFICATION_CHANNEL, message.toString());
   });
+
+  return getActiveGames();
 });
 
 console.log(

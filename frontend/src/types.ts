@@ -4,7 +4,7 @@
 export enum BetType {
   Home = "home",
   Away = "away",
-  Draw = "draw",
+  // Draw = "draw",
 }
 
 // Interface for Odds
@@ -12,7 +12,7 @@ export interface Odds {
   id: string;
   home: number;
   away: number;
-  draw: number;
+  // draw: number;
   game?: Game | null;
 }
 
@@ -45,3 +45,32 @@ export interface LeaderboardEntry {
   username: string;
   totalWinnings: number;
 }
+
+interface GameData {
+  gameId: string;
+  team1: string;
+  team2: string;
+  score1: number;
+  score2: number;
+  timeRemaining: string;
+}
+
+interface OddsUpdate {
+  gameId: string;
+  odds: {
+    team1: number;
+    team2: number;
+  };
+}
+
+interface LeaderboardUpdate {
+  userId: string;
+  userName: string;
+  points: number;
+}
+
+export type EventData =
+  | { type: "gameData"; data: GameData }
+  | { type: "oddsUpdate"; data: OddsUpdate }
+  | { type: "leaderboardUpdate"; data: LeaderboardUpdate[] }
+  | { type: "createGame"; data: Game };

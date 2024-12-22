@@ -60,7 +60,7 @@ export const BetForm: React.FC = () => {
         >
           <option value={BetType.Home}>Home</option>
           <option value={BetType.Away}>Away</option>
-          <option value={BetType.Draw}>Draw</option>
+          {/* <option value={BetType.Draw}>Draw</option> */}
         </select>
       </div>
       <button
